@@ -3,6 +3,7 @@ package com.codepath.nytsearch.activities;
 import com.codepath.nytsearch.R;
 import com.codepath.nytsearch.adapters.ArticleArrayAdapter;
 import com.codepath.nytsearch.models.Article;
+import com.codepath.nytsearch.utils.EndlessScrollListener;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -47,6 +48,8 @@ public class SearchActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ButterKnife.bind(this);
+
+        setEventListeners();
     }
 
     @Override
@@ -83,18 +86,18 @@ public class SearchActivity extends AppCompatActivity {
 
     @OnClick(R.id.btnSearch)
     public void onArticleSearch(View view) {
-        fetchArticlesAsync();
-    }
-
-    private void fetchArticlesAsync() {
         articles = new ArrayList<>();
         articleAdapter = new ArticleArrayAdapter(this, articles);
         gvResults.setAdapter(articleAdapter);
 
+        fetchArticlesAsync(0);
+    }
+
+    private void fetchArticlesAsync(int page) {
         final String url = "http://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
         params.put("api-key", "80230c8b90574180a1de9425e2d5dbcd");
-        params.put("page", 0);
+        params.put("page", page);
         params.put("q", etQuery.getText().toString());
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -115,6 +118,16 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
+            }
+        });
+    }
+
+    private void setEventListeners() {
+        gvResults.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                fetchArticlesAsync(page);
+                return true;
             }
         });
     }
