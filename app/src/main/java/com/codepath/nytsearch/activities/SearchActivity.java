@@ -126,8 +126,12 @@ public class SearchActivity extends AppCompatActivity {
         gvResults.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
-                fetchArticlesAsync(page);
-                return true;
+                if (page <= 10) {
+                    fetchArticlesAsync(page);
+                    return true;
+                } else {
+                    return false;
+                }
             }
         });
     }
