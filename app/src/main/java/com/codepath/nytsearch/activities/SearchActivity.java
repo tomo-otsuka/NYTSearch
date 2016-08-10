@@ -86,7 +86,7 @@ public class SearchActivity extends AppCompatActivity {
         fetchArticlesAsync(0);
     }
 
-    private void fetchArticlesAsync(int page) {
+    private void fetchArticlesAsync(final int page) {
         final String url = "http://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
         params.put("api-key", "80230c8b90574180a1de9425e2d5dbcd");
@@ -102,7 +102,7 @@ public class SearchActivity extends AppCompatActivity {
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
                     articles.addAll(Article.fromJSONArray(articleJsonResults));
-                    articleAdapter.notifyDataSetChanged();
+                    articleAdapter.notifyItemRangeInserted(page * 10, articles.size() - 1);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
