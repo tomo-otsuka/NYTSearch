@@ -27,7 +27,8 @@ public class DatePickerDialogFragment extends DialogFragment {
         void onDatePicked(Calendar calendar);
     }
 
-    public DatePickerDialogFragment() {}
+    public DatePickerDialogFragment() {
+    }
 
     public static DatePickerDialogFragment newInstance(String title) {
         DatePickerDialogFragment fragment = new DatePickerDialogFragment();
@@ -53,15 +54,11 @@ public class DatePickerDialogFragment extends DialogFragment {
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
-
-        Calendar calendar = Calendar.getInstance();
-        dpBeginDate.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-
-            @Override
-            public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
-                sendBackResult();
-            }
-        });
+        Calendar calendar = GregorianCalendar.getInstance();
+        dpBeginDate.init(
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH),
+                (dp, y, m, d) -> sendBackResult()
+        );
     }
 
     @Override
