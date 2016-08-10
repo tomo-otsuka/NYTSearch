@@ -1,9 +1,9 @@
 package com.codepath.nytsearch.activities;
 
 import com.codepath.nytsearch.R;
-import com.codepath.nytsearch.adapters.ArticleArrayAdapter;
+import com.codepath.nytsearch.adapters.ArticlesAdapter;
 import com.codepath.nytsearch.models.Article;
-import com.codepath.nytsearch.utils.EndlessScrollListener;
+import com.codepath.nytsearch.utils.EndlessRecyclerViewScrollListener;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -12,33 +12,32 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnItemClick;
 import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity {
 
     @BindView(R.id.etQuery) EditText etQuery;
-    @BindView(R.id.gvResults) GridView gvResults;
     @BindView(R.id.btnSearch) Button btnSearch;
+    @BindView(R.id.rvArticles) RecyclerView rvArticles;
 
     ArrayList<Article> articles;
-    ArticleArrayAdapter articleAdapter;
+    ArticlesAdapter articleAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +47,10 @@ public class SearchActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ButterKnife.bind(this);
+
+        StaggeredGridLayoutManager gridLayoutManager =
+                new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+        rvArticles.setLayoutManager(gridLayoutManager);
 
         setEventListeners();
     }
@@ -74,21 +77,11 @@ public class SearchActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @OnItemClick(R.id.gvResults)
-    public void onArticleClick(int position) {
-        Article article = articles.get(position);
-
-        Intent intent = new Intent(this, ArticleActivity.class);
-        intent.putExtra("article", article);
-
-        startActivity(intent);
-    }
-
     @OnClick(R.id.btnSearch)
     public void onArticleSearch(View view) {
         articles = new ArrayList<>();
-        articleAdapter = new ArticleArrayAdapter(this, articles);
-        gvResults.setAdapter(articleAdapter);
+        articleAdapter = new ArticlesAdapter(this, articles);
+        rvArticles.setAdapter(articleAdapter);
 
         fetchArticlesAsync(0);
     }
@@ -123,15 +116,10 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setEventListeners() {
-        gvResults.setOnScrollListener(new EndlessScrollListener() {
+        rvArticles.addOnScrollListener(new EndlessRecyclerViewScrollListener((StaggeredGridLayoutManager) rvArticles.getLayoutManager()) {
             @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-                if (page <= 10) {
-                    fetchArticlesAsync(page);
-                    return true;
-                } else {
-                    return false;
-                }
+            public void onLoadMore(int page, int totalItemsCount) {
+                fetchArticlesAsync(page);
             }
         });
     }
