@@ -2,6 +2,7 @@ package com.codepath.nytsearch.activities;
 
 import com.codepath.nytsearch.R;
 import com.codepath.nytsearch.adapters.ArticlesAdapter;
+import com.codepath.nytsearch.fragments.SettingsDialogFragment;
 import com.codepath.nytsearch.models.Article;
 import com.codepath.nytsearch.utils.EndlessRecyclerViewScrollListener;
 import com.loopj.android.http.AsyncHttpClient;
@@ -13,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -55,6 +57,12 @@ public class SearchActivity extends AppCompatActivity {
         setEventListeners();
     }
 
+    public void showSettingsDialog(MenuItem mi) {
+        FragmentManager fm = getSupportFragmentManager();
+        SettingsDialogFragment settingDialogFragment = SettingsDialogFragment.newInstance("Filter Settings");
+        settingDialogFragment.show(fm, "fragment_edit_name");
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -70,11 +78,13 @@ public class SearchActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                showSettingsDialog(item);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @OnClick(R.id.btnSearch)
@@ -97,10 +107,8 @@ public class SearchActivity extends AppCompatActivity {
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                JSONArray articleJsonResults = null;
-
                 try {
-                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
+                    JSONArray articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
                     articles.addAll(Article.fromJSONArray(articleJsonResults));
                     articleAdapter.notifyItemRangeInserted(page * 10, articles.size() - 1);
                 } catch (JSONException e) {
