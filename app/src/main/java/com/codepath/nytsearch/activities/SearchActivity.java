@@ -151,7 +151,7 @@ public class SearchActivity extends AppCompatActivity {
                     try {
                         JSONArray articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
                         articles.addAll(Article.fromJSONArray(articleJsonResults));
-                        articleAdapter.notifyItemRangeInserted(page * 10, articles.size() - 1);
+                        articleAdapter.notifyItemRangeInserted(page * 10, 10);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
