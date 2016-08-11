@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -96,12 +98,69 @@ public class SearchActivity extends AppCompatActivity {
         fetchArticlesAsync(0);
     }
 
+    private String queryStringFromSettings() {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        Boolean newsDeskArts = sharedPref.getBoolean("newsDeskArts", false);
+        Boolean newsDeskFashion = sharedPref.getBoolean("newsDeskFashion", false);
+        Boolean newsDeskSports = sharedPref.getBoolean("newsDeskSports", false);
+
+        if (!newsDeskArts && !newsDeskFashion && !newsDeskSports) {
+            return null;
+        }
+
+        String query = "news_desk:(";
+        if (newsDeskArts) {
+            query += "\"Arts\" ";
+        }
+        if (newsDeskFashion) {
+            query += "\"Fashion\" ";
+        }
+        if (newsDeskSports) {
+            query += "\"Sports\" ";
+        }
+
+        query = query.substring(0, query.length() - 1);
+        query += ")";
+
+        return query;
+    }
+
+    private String getBeginDateFromSettings() {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        String beginDate = sharedPref.getString("beginDate", "");
+        return beginDate.replaceAll("-", "");
+    }
+
+    private String getSortOrderFromSettings() {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        int sortOrder = sharedPref.getInt("sortOrder", 0);
+        if (sortOrder == 0) {
+            return "newest";
+        } else {
+            return "oldest";
+        }
+    }
+
     private void fetchArticlesAsync(final int page) {
         final String url = "http://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
         params.put("api-key", "80230c8b90574180a1de9425e2d5dbcd");
         params.put("page", page);
-        params.put("q", etQuery.getText().toString());
+
+        String beginDate = getBeginDateFromSettings();
+        if (beginDate != null) {
+            params.put("begin_date", beginDate);
+        }
+
+        String sortOrder = getSortOrderFromSettings();
+        params.put("sort", sortOrder);
+
+        String query = etQuery.getText().toString();
+        String querySettings = queryStringFromSettings();
+        if (querySettings != null) {
+            query += " AND " + querySettings;
+        }
+        params.put("fq", query);
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, params, new JsonHttpResponseHandler() {
@@ -124,9 +183,9 @@ public class SearchActivity extends AppCompatActivity {
 
     private void setEventListeners() {
         rvArticles.addOnScrollListener(new EndlessRecyclerViewScrollListener((StaggeredGridLayoutManager) rvArticles.getLayoutManager()) {
-                    @Override
-                    public void onLoadMore(int page, int totalItemsCount) {
-                        fetchArticlesAsync(page);
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                fetchArticlesAsync(page);
             }
         });
     }
