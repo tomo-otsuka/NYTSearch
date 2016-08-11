@@ -36,8 +36,18 @@ public class Article {
         JSONArray multimedia = jsonObject.getJSONArray("multimedia");
 
         if (multimedia.length() > 0) {
-            JSONObject multimediaJson = multimedia.getJSONObject(0);
-            this.thumbnail = "http://www.nytimes.com/" + multimediaJson.getString("url");
+            String thumbnailUrl = null;
+            for (int i = 0; i < multimedia.length(); i++) {
+                JSONObject multimediaJson = multimedia.getJSONObject(i);
+                if (multimediaJson.getString("subtype") == "thumbnail") {
+                    thumbnailUrl = multimediaJson.getString("url");
+                    break;
+                }
+            }
+            if (thumbnailUrl == null) {
+                thumbnailUrl = multimedia.getJSONObject(0).getString("url");
+            }
+            this.thumbnail = "http://www.nytimes.com/" + thumbnailUrl;
         } else {
             this.thumbnail = "";
         }
