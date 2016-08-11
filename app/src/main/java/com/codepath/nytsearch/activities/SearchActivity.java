@@ -118,16 +118,15 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
             }
         });
     }
 
     private void setEventListeners() {
         rvArticles.addOnScrollListener(new EndlessRecyclerViewScrollListener((StaggeredGridLayoutManager) rvArticles.getLayoutManager()) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-                fetchArticlesAsync(page);
+                    @Override
+                    public void onLoadMore(int page, int totalItemsCount) {
+                        fetchArticlesAsync(page);
             }
         });
     }

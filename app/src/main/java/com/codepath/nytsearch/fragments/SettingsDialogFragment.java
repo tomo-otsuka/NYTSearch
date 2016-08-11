@@ -2,6 +2,8 @@ package com.codepath.nytsearch.fragments;
 
 import com.codepath.nytsearch.R;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -9,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -22,6 +26,10 @@ import butterknife.Unbinder;
 public class SettingsDialogFragment extends DialogFragment implements DatePickerDialogFragment.DatePickerDialogListener {
 
     @BindView(R.id.etBeginDate) EditText etBeginDate;
+    @BindView(R.id.spSortOrder) Spinner spSortOrder;
+    @BindView(R.id.cbNewsDeskArts) CheckBox cbNewsDeskArts;
+    @BindView(R.id.cbNewsDeskFashion) CheckBox cbNewsDeskFashion;
+    @BindView(R.id.cbNewsDeskSports) CheckBox cbNewsDeskSports;
     private Unbinder unbinder;
 
     public SettingsDialogFragment() {
@@ -53,12 +61,42 @@ public class SettingsDialogFragment extends DialogFragment implements DatePicker
         getDialog().setTitle(title);
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+        loadSettings();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @OnClick(R.id.btnSave)
+    public void saveSettings() {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("beginDate", etBeginDate.getText().toString());
+        editor.putInt("sortOrder", spSortOrder.getSelectedItemPosition());
+        editor.putBoolean("newsDeskArts", cbNewsDeskArts.isChecked());
+        editor.putBoolean("newsDeskFashion", cbNewsDeskFashion.isChecked());
+        editor.putBoolean("newsDeskSports", cbNewsDeskSports.isChecked());
+        editor.commit();
+        dismiss();
+    }
+
+    public void loadSettings() {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String beginDate = sharedPref.getString("beginDate", "");
+        int sortOrder = sharedPref.getInt("sortOrder", 0);
+        Boolean newsDeskArts = sharedPref.getBoolean("newsDeskArts", false);
+        Boolean newsDeskFashion = sharedPref.getBoolean("newsDeskFashion", false);
+        Boolean newsDeskSports = sharedPref.getBoolean("newsDeskSports", false);
+
+        etBeginDate.setText(beginDate);
+        spSortOrder.setSelection(sortOrder);
+        cbNewsDeskArts.setChecked(newsDeskArts);
+        cbNewsDeskFashion.setChecked(newsDeskFashion);
+        cbNewsDeskSports.setChecked(newsDeskSports);
     }
 
     @OnClick(R.id.etBeginDate)
