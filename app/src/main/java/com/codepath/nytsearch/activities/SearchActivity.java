@@ -43,6 +43,8 @@ public class SearchActivity extends AppCompatActivity {
     ArticlesAdapter articleAdapter;
     String mQuery;
 
+    private long mLastSearchTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,8 +90,14 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                if (System.currentTimeMillis() - mLastSearchTime < 500) {
+                    return false;
+                }
+
                 mQuery = newText;
                 articleSearch();
+
+                mLastSearchTime = System.currentTimeMillis();
                 return true;
             }
         });
@@ -115,16 +123,14 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public void articleSearch() {
-        boolean doReset = false;
         if (articles != null) {
-            doReset = true;
-        }
-        articles = new ArrayList<>();
-        articleAdapter = new ArticlesAdapter(this, articles);
-        rvArticles.setAdapter(articleAdapter);
-
-        if (doReset) {
-            articleAdapter.notifyDataSetChanged();
+            int clearedCount = articles.size();
+            articles.clear();
+            articleAdapter.notifyItemRangeRemoved(0, clearedCount);
+        } else {
+            articles = new ArrayList<>();
+            articleAdapter = new ArticlesAdapter(this, articles);
+            rvArticles.setAdapter(articleAdapter);
         }
 
         fetchArticlesAsync(0);
