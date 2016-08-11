@@ -2,15 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:scaleType="center"
-        android:id="@+id/ivImage"
-        android:src="@mipmap/ic_launcher" />
-
     <TextView
-        android:textColor="#F6DBFF"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tvHeadline"/>

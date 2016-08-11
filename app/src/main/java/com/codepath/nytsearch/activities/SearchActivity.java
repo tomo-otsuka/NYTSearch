@@ -115,9 +115,17 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public void articleSearch() {
+        boolean doReset = false;
+        if (articles != null) {
+            doReset = true;
+        }
         articles = new ArrayList<>();
         articleAdapter = new ArticlesAdapter(this, articles);
         rvArticles.setAdapter(articleAdapter);
+
+        if (doReset) {
+            articleAdapter.notifyDataSetChanged();
+        }
 
         fetchArticlesAsync(0);
     }
