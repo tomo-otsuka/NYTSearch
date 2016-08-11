@@ -10,7 +10,11 @@
         android:src="@mipmap/ic_launcher" />
 
     <TextView
-        android:textColor="#F6DBFF"
+        android:textColor="#ffffff"
+        android:shadowColor="#000000"
+        android:shadowDx="1.5"
+        android:shadowDy="1.3"
+        android:shadowRadius="1.0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tvHeadline"/>
