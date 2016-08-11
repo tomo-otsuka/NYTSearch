@@ -164,7 +164,7 @@ public class SearchActivity extends AppCompatActivity {
         }
         params.put("fq", query);
 
-        if (Network.isNetworkAvailable(this)) {
+        if (Network.isNetworkAvailable(this) && Network.isOnline()) {
             AsyncHttpClient client = new AsyncHttpClient();
             client.get(url, params, new JsonHttpResponseHandler() {
                 @Override
