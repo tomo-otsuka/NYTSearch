@@ -25,6 +25,10 @@ import butterknife.Unbinder;
 
 public class SettingsDialogFragment extends DialogFragment implements DatePickerDialogFragment.DatePickerDialogListener {
 
+    public interface SettingsDialogListener {
+        void onSettingsSave();
+    }
+
     @BindView(R.id.etBeginDate) EditText etBeginDate;
     @BindView(R.id.spSortOrder) Spinner spSortOrder;
     @BindView(R.id.cbNewsDeskArts) CheckBox cbNewsDeskArts;
@@ -81,6 +85,10 @@ public class SettingsDialogFragment extends DialogFragment implements DatePicker
         editor.putBoolean("newsDeskFashion", cbNewsDeskFashion.isChecked());
         editor.putBoolean("newsDeskSports", cbNewsDeskSports.isChecked());
         editor.commit();
+
+        SettingsDialogListener listener = (SettingsDialogListener) getActivity();
+        listener.onSettingsSave();
+
         dismiss();
     }
 

@@ -35,7 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements SettingsDialogFragment.SettingsDialogListener {
 
     @BindView(R.id.rvArticles) RecyclerView rvArticles;
 
@@ -58,7 +58,14 @@ public class SearchActivity extends AppCompatActivity {
                 new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
         rvArticles.setLayoutManager(gridLayoutManager);
 
+        articleSearch();
+
         setEventListeners();
+    }
+
+    @Override
+    public void onSettingsSave() {
+        articleSearch();
     }
 
     public void showSettingsDialog(MenuItem mi) {
@@ -153,9 +160,17 @@ public class SearchActivity extends AppCompatActivity {
         String query = mQuery;
         String querySettings = queryStringFromSettings();
         if (querySettings != null) {
-            query += " AND " + querySettings;
+            if (query != null) {
+                query += " AND " + querySettings;
+            } else {
+                query = querySettings;
+            }
         }
         params.put("fq", query);
+
+        if (query == null || query == "") {
+            return;
+        }
 
         if (Network.isNetworkAvailable(this) && Network.isOnline()) {
             AsyncHttpClient client = new AsyncHttpClient();
