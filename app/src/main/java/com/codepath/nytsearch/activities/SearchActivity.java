@@ -5,6 +5,7 @@ import com.codepath.nytsearch.adapters.ArticlesAdapter;
 import com.codepath.nytsearch.fragments.SettingsDialogFragment;
 import com.codepath.nytsearch.models.Article;
 import com.codepath.nytsearch.utils.EndlessRecyclerViewScrollListener;
+import com.codepath.nytsearch.utils.Network;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -26,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -162,23 +164,27 @@ public class SearchActivity extends AppCompatActivity {
         }
         params.put("fq", query);
 
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                try {
-                    JSONArray articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                    articles.addAll(Article.fromJSONArray(articleJsonResults));
-                    articleAdapter.notifyItemRangeInserted(page * 10, articles.size() - 1);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        if (Network.isNetworkAvailable(this)) {
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.get(url, params, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    try {
+                        JSONArray articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
+                        articles.addAll(Article.fromJSONArray(articleJsonResults));
+                        articleAdapter.notifyItemRangeInserted(page * 10, articles.size() - 1);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-            }
-        });
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                }
+            });
+        } else {
+            Toast.makeText(this, "Network Error", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void setEventListeners() {
