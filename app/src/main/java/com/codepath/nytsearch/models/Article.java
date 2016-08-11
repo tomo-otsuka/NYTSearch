@@ -3,11 +3,12 @@ package com.codepath.nytsearch.models;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Article implements Serializable {
+@Parcel
+public class Article {
 
     public String getWebUrl() {
         return webUrl;
@@ -24,6 +25,9 @@ public class Article implements Serializable {
     String webUrl;
     String headline;
     String thumbnail;
+
+    public Article() {
+    }
 
     public Article(JSONObject jsonObject) throws JSONException {
         this.webUrl = jsonObject.getString("web_url");
@@ -51,4 +55,3 @@ public class Article implements Serializable {
         return results;
     }
 }
-

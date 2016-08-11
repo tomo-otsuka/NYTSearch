@@ -5,6 +5,8 @@ import com.codepath.nytsearch.activities.ArticleActivity;
 import com.codepath.nytsearch.models.Article;
 import com.squareup.picasso.Picasso;
 
+import org.parceler.Parcels;
+
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -38,7 +40,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
             Article article = mArticles.get(position);
 
             Intent intent = new Intent(getContext(), ArticleActivity.class);
-            intent.putExtra("article", article);
+            intent.putExtra("article", Parcels.wrap(article));
 
             getContext().startActivity(intent);
         }

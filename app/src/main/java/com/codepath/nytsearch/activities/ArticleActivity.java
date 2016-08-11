@@ -3,6 +3,8 @@ package com.codepath.nytsearch.activities;
 import com.codepath.nytsearch.R;
 import com.codepath.nytsearch.models.Article;
 
+import org.parceler.Parcels;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -29,7 +31,7 @@ public class ArticleActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        Article article = (Article) intent.getSerializableExtra("article");
+        Article article = (Article) Parcels.unwrap(intent.getParcelableExtra("article"));
         wvArticle.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
