@@ -4,7 +4,7 @@
     tools:context=".activities.SearchActivity">
     <item
         android:id="@+id/action_settings"
-        android:icon="@drawable/filter_128"
+        android:icon="@drawable/filter_outline"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="ifRoom" />
