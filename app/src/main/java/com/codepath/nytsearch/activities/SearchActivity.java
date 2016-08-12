@@ -17,9 +17,11 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -38,6 +40,7 @@ import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity implements SettingsDialogFragment.SettingsDialogListener {
 
+    private SwipeRefreshLayout swipeContainer;
     @BindView(R.id.rvArticles) RecyclerView rvArticles;
 
     ArrayList<Article> articles;
@@ -68,7 +71,24 @@ public class SearchActivity extends AppCompatActivity implements SettingsDialogF
 
         articleSearch();
 
+        initSwipeContainer();
         setEventListeners();
+    }
+
+    private void initSwipeContainer() {
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                articleSearch();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
     }
 
     @Override
@@ -105,7 +125,14 @@ public class SearchActivity extends AppCompatActivity implements SettingsDialogF
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                if (mLastSearchTime == 0) {
+                    mLastSearchTime = System.currentTimeMillis();
+                    return false;
+                }
                 if (System.currentTimeMillis() - mLastSearchTime < 500) {
+                    return false;
+                }
+                if (newText == null || newText == "") {
                     return false;
                 }
 
@@ -192,15 +219,18 @@ public class SearchActivity extends AppCompatActivity implements SettingsDialogF
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    swipeContainer.setRefreshing(false);
                 }
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     Toast.makeText(SearchActivity.this, "Failed to retrieve results", Toast.LENGTH_LONG).show();
+                    swipeContainer.setRefreshing(false);
                 }
             });
         } else {
             Toast.makeText(this, "Network Error", Toast.LENGTH_LONG).show();
+            swipeContainer.setRefreshing(false);
         }
     }
 
