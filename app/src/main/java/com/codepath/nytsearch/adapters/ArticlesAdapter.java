@@ -135,7 +135,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         ImageView ivImage = normalViewHolder.ivImage;
         ivImage.setImageResource(0);
         String thumbnail = article.getThumbnail();
-        Picasso.with(getContext()).load(thumbnail).fit().centerCrop()
+        Picasso.with(getContext()).load(thumbnail)
                 .into(ivImage);
     }
 
@@ -149,5 +149,4 @@ public class ArticlesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public int getItemCount() {
         return mArticles.size();
     }
-
 }
