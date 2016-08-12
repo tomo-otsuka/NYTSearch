@@ -6,6 +6,7 @@ import com.codepath.nytsearch.fragments.SettingsDialogFragment;
 import com.codepath.nytsearch.models.Article;
 import com.codepath.nytsearch.utils.EndlessRecyclerViewScrollListener;
 import com.codepath.nytsearch.utils.Network;
+import com.codepath.nytsearch.utils.SpacesItemDecoration;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -54,9 +55,16 @@ public class SearchActivity extends AppCompatActivity implements SettingsDialogF
 
         ButterKnife.bind(this);
 
+        int numCols = 2;
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            numCols = 3;
+        }
         StaggeredGridLayoutManager gridLayoutManager =
-                new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+                new StaggeredGridLayoutManager(numCols, StaggeredGridLayoutManager.VERTICAL);
         rvArticles.setLayoutManager(gridLayoutManager);
+
+        SpacesItemDecoration decoration = new SpacesItemDecoration(numCols, 16);
+        rvArticles.addItemDecoration(decoration);
 
         articleSearch();
 
